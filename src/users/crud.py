@@ -1,5 +1,6 @@
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from src.users.schemas import CreateUserSchema, LoginUserSchema
 from src.core.models.users import Users
 import bcrypt
@@ -19,6 +20,19 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
 
 
 async def login_user(session: AsyncSession, user_in: LoginUserSchema):
-    user_login = user_in.model_dump()
-    query = select()
+    query = select(Users).where(Users.username == user_in.username)
+    result = await session.execute(query)
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Пользователь с таким именем не найден"
+        )
+    if not bcrypt.checkpw(user_in.password.encode('utf-8'), user.password.encode('utf-8')):
+        raise HTTPException(
+            status_code=401,
+            detail="Пароль введен неверно"
+        )
+    return {'message': True}
+
 

@@ -19,4 +19,4 @@ async def login_user(
         user: LoginUserSchema,
         session: AsyncSession = Depends(db_helper.session_dependency)
     ):
-    return await
+    return await crud.login_user(session=session, user_in=user)
