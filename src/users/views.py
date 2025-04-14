@@ -14,9 +14,13 @@ async def create_user(
     ):
     return await crud.create_user(session=session, user_in=user)
 
+
 @router.post('/users/login')
 async def login_user(
         user: LoginUserSchema,
         session: AsyncSession = Depends(db_helper.session_dependency)
     ):
     return await crud.login_user(session=session, user_in=user)
+
+
+# @router.get('/user/profile')
