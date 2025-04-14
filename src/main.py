@@ -4,7 +4,6 @@ import uvicorn
 
 from fastapi import FastAPI
 
-from src.core.models.users import Users
 from src.users.views import router as users_router
 
 

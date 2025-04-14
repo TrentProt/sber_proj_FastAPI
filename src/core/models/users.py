@@ -9,7 +9,7 @@ class Users(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    username: Mapped[str] = mapped_column(String(32), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255))
     bio: Mapped[Union[str, None]] = mapped_column(String(255), nullable=True)
     create_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
