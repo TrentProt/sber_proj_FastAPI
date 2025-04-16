@@ -10,9 +10,8 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
     if user['password1'] != user['password2']:
         raise HTTPException(status_code=401, detail='Пароли не совпадают')
     user_to_save = Users(
-        username=user["username"],
+        number=user["number"],
         password=bcrypt.hashpw(user['password1'].encode('utf-8'), bcrypt.gensalt(rounds=4)).decode('utf-8'),
-        bio=None
     )
     session.add(user_to_save)
     await session.commit()
@@ -20,7 +19,7 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
 
 
 async def login_user(session: AsyncSession, user_in: LoginUserSchema):
-    query = select(Users).where(Users.username == user_in.username)
+    query = select(Users).where(Users.number == user_in.number)
     result = await session.execute(query)
     user = result.scalar_one_or_none()
     if user is None:

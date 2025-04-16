@@ -1,22 +1,31 @@
-from datetime import datetime
-from typing import Union
+from datetime import datetime, time
+from typing import Union, Optional, TYPE_CHECKING
 
-from sqlalchemy import String, Integer, ForeignKey
+from sqlalchemy import String, Integer, ForeignKey, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from src.core.models.base import Base
+
+
+if TYPE_CHECKING:
+    from src.core.models.rewards import Rewards
+    from src.core.models import TestsName
 
 class Users(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    reward_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('rewards.id'), nullable=True)
     number: Mapped[str] = mapped_column(String(12), unique=True, index=True)
-    password: Mapped[str] = mapped_column(String(255))
-    create_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    password: Mapped[str] = mapped_column(String(255), index=True)
+    create_at: Mapped[datetime] = mapped_column(default=datetime.now)
 
-    profile: Mapped['Profile'] = relationship(back_populates='user')
+    profile: Mapped['Profiles'] = relationship(back_populates='user')
+    reward: Mapped[Optional['Rewards']] = relationship(back_populates='user')
+    user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='user')
 
 
-class Profile(Base):
+class Profiles(Base):
     __tablename__ = 'profiles'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -28,13 +37,17 @@ class Profile(Base):
 
     user: Mapped["Users"] = relationship(back_populates='profile')
 
-class UserRewards(Base):
-    __tablename__ = 'user_rewards'
+
+class UserAttempts(Base):
+    __tablename__ = 'user_attempts'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    reward_id: Mapped[int] = mapped_column(Integer, ForeignKey('rewards.id'))
-    attempt_id: Mapped[int] = mapped_column(Integer, ForeignKey('test_attempts.id'))
-    awarded_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), index=True)
+    test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'), index=True)
+    count_correct_answer: Mapped[int] = mapped_column(Integer)
+    total_questions: Mapped[int] = mapped_column(Integer)
+    time_execution: Mapped[time] = mapped_column(Time)
+    complete_at: Mapped[datetime] = mapped_column(default=datetime.now, index=True)
 
-    # user: Mapped[]
+    user: Mapped['Users'] = relationship(back_populates='user_attempt')
+    test: Mapped['TestsName'] = relationship(back_populates='user_attempt')
