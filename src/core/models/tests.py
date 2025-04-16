@@ -10,6 +10,7 @@ class Topics(Base):
     name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(String(255))
 
+
 class TestsName(Base):
     __tablename__ = 'tests'
 
@@ -26,4 +27,12 @@ class QuestionsAnswers(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'))
     question_text: Mapped[str] = mapped_column(String(255), unique=True)
-    correct_answer: Mapped[str] = mapped_column(String(255), unique=True)
+    correct_answer: Mapped[str] = mapped_column(String(255))
+
+
+class WrongAnswers(Base):
+    __tablename__ = 'wrong_answers'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    question_id: Mapped[int] = mapped_column(Integer, ForeignKey('questions_answers.id'))
+    wrong_answer_text: Mapped[str] = mapped_column(String(255))
