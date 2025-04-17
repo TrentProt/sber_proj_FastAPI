@@ -13,6 +13,7 @@ class Topics(Base):
 
     test: Mapped[list['TestsName']] = relationship(back_populates='topic')
 
+
 class TestsName(Base):
     __tablename__ = 'tests'
 

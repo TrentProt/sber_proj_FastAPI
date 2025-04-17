@@ -1,8 +1,12 @@
 from fastapi import HTTPException
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
 from src.users.schemas import CreateUserSchema, LoginUserSchema
 from src.core.models.users import Users
+from src.auth.utils import encode_jwt
+
 import bcrypt
 
 async def create_user(session: AsyncSession, user_in: CreateUserSchema):
@@ -32,6 +36,10 @@ async def login_user(session: AsyncSession, user_in: LoginUserSchema):
             status_code=401,
             detail="Пароль введен неверно"
         )
-    return {'message': True}
+    jwt_payload = {
+        'sub': user.id
+    }
+    token = encode_jwt(jwt_payload)
+    return {'access': token}
 
 

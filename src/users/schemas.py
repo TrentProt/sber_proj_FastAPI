@@ -3,8 +3,8 @@ import re
 from typing import Optional
 
 class CreateUserSchema(BaseModel):
-    number: str = Field(..., min_length=11, max_length=12)
-    password1: str = Field(..., min_length=8)
+    number: str = Field(min_length=11, max_length=12, examples=['string'])
+    password1: str = Field(min_length=8, examples=['string'])
     password2: str
 
     @field_validator('number')

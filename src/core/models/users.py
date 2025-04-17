@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from src.core.models.rewards import Rewards
     from src.core.models import TestsName
 
+
 class Users(Base):
     __tablename__ = 'users'
 
@@ -18,9 +19,9 @@ class Users(Base):
     reward_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('rewards.id'), nullable=True)
     number: Mapped[str] = mapped_column(String(12), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255), index=True)
-    create_at: Mapped[datetime] = mapped_column(default=datetime.now)
+    create_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    profile: Mapped['Profiles'] = relationship(back_populates='user')
+    profile: Mapped['Profiles'] = relationship(back_populates='user', uselist=False)
     reward: Mapped[Optional['Rewards']] = relationship(back_populates='user')
     user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='user')
 
@@ -29,7 +30,7 @@ class Profiles(Base):
     __tablename__ = 'profiles'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), unique=True)
     first_name: Mapped[Union[str, None]] = mapped_column(String(30), nullable=True)
     last_name: Mapped[Union[str, None]] = mapped_column(String(30), nullable=True)
     middle_name: Mapped[Union[str, None]] = mapped_column(String(30), nullable=True)
@@ -47,7 +48,7 @@ class UserAttempts(Base):
     count_correct_answer: Mapped[int] = mapped_column(Integer)
     total_questions: Mapped[int] = mapped_column(Integer)
     time_execution: Mapped[time] = mapped_column(Time)
-    complete_at: Mapped[datetime] = mapped_column(default=datetime.now, index=True)
+    complete_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, index=True)
 
     user: Mapped['Users'] = relationship(back_populates='user_attempt')
     test: Mapped['TestsName'] = relationship(back_populates='user_attempt')
