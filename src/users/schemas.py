@@ -38,3 +38,7 @@ class LoginUserSchema(BaseModel):
         if not re.match(r'^\+?\d{11,12}$', v):
             raise ValueError('Номер должен содержать 11-12 цифр')
         return v
+
+
+class UserSchema(LoginUserSchema):
+    id: int

@@ -19,10 +19,11 @@ def encode_jwt(
     return encoded
 
 
-def decode_jwt(token: Union[str, bytes],
-               public_key: str = settings.auth_jwt.public_key_path.read_text(),
-               algorithm: str = settings.auth_jwt.algorithm
-            ):
+def decode_jwt(
+        token: Union[str, bytes],
+        public_key: str = settings.auth_jwt.public_key_path.read_text(),
+        algorithm: str = settings.auth_jwt.algorithm
+        ):
     decoded = jwt.decode(token, public_key, algorithms=[algorithm])
     return decoded
 
