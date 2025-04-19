@@ -1,7 +1,11 @@
-from fastapi import HTTPException, Response
+from typing import Union, Optional
+from urllib.request import Request
+
+from fastapi import HTTPException, Response, Cookie
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 from src.auth.helpers import create_access_token, create_refresh_token
 from src.users.schemas import CreateUserSchema, LoginUserSchema
@@ -14,8 +18,12 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
     user = user_in.model_dump()
     if user['password1'] != user['password2']:
         raise HTTPException(status_code=401, detail='Пароли не совпадают')
+    if user["number"][:2] == '+7':
+        number = user['number'].replace('+7', '8')
+    else:
+        number = user['number']
     user_to_save = Users(
-        number=user["number"],
+        number=number,
         password=bcrypt.hashpw(user['password1'].encode('utf-8'), bcrypt.gensalt(rounds=4)).decode('utf-8'),
     )
     session.add(user_to_save)
@@ -24,7 +32,11 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
 
 
 async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: Response):
-    query = select(Users).where(Users.number == user_in.number)
+    if user_in.number[2:] == '+7':
+        number = user_in.number.replace('+7', '8')
+    else:
+        number = user_in.number
+    query = select(Users).where(Users.number == number)
     result = await session.execute(query)
     user = result.scalar_one_or_none()
     if user is None:
@@ -45,3 +57,8 @@ async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: 
             'refresh_token': refresh_token}
 
 
+async def profile_user(session: AsyncSession, payload: dict):
+    user_id = int(payload['sub'])
+    stmt = select(Users).options(joinedload(Users.profile)).where(Users.id == user_id)
+    user = await session.scalar(stmt)
+    return {'ok': user.profile.first_name}

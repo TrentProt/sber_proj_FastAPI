@@ -1,7 +1,6 @@
-from pathlib import Path
+from datetime import datetime
 
-from pydantic import BaseModel
-from pydantic_settings import BaseSettings
-
-BASE_DIR = Path(__file__)
-print(BASE_DIR)
+current_time = datetime.utcnow().timestamp()
+p = 123
+if current_time > p:
+    print(True)
