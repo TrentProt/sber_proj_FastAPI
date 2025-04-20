@@ -5,7 +5,8 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.users.views import router as users_router
+from src.api_v1.users.views import router as users_router
+from src.api_v1.auth.views import router as auth_router
 
 
 
@@ -18,6 +19,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(users_router)
+app.include_router(auth_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

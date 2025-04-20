@@ -1,14 +1,11 @@
 import asyncio
 
-import bcrypt
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
 from src.core.models.users import Users, Profiles
 from src.core.models import db_helper
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.users.schemas import CreateUserSchema
 
 
 # async def create_user(session: AsyncSession, user: CreateUserSchema):

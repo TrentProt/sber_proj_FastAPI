@@ -1,16 +1,12 @@
-from typing import Union, Optional
-from urllib.request import Request
-
 from fastapi import HTTPException, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from src.auth.helpers import create_access_token, create_refresh_token
-from src.users.schemas import CreateUserSchema, LoginUserSchema
+from src.api_v1.auth.helpers import create_access_token, create_refresh_token
+from src.api_v1.users.schemas import CreateUserSchema, LoginUserSchema
 from src.core.models.users import Users
-from src.auth.utils import encode_jwt, decode_jwt
 
 import bcrypt
 

@@ -1,6 +1,5 @@
-from src.auth.utils import encode_jwt
+from src.api_v1.auth.utils import encode_jwt
 from src.core.config import settings
-from src.core.models import Users
 
 
 TOKEN_TYPE_FIELD = 'type'
