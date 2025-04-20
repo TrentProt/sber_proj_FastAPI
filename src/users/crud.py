@@ -1,7 +1,7 @@
 from typing import Union, Optional
 from urllib.request import Request
 
-from fastapi import HTTPException, Response, Cookie
+from fastapi import HTTPException, Response
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -49,10 +49,10 @@ async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: 
             status_code=401,
             detail="Пароль введен неверно"
         )
-    access_token = create_access_token(user)
-    response.set_cookie('access_token', access_token)
-    refresh_token = create_refresh_token(user)
-    response.set_cookie('refresh_token', refresh_token)
+    access_token = create_access_token(user.id)
+    response.set_cookie('access_token', access_token, secure=True)
+    refresh_token = create_refresh_token(user.id)
+    response.set_cookie('refresh_token', refresh_token, secure=True)
     return {'access_token': access_token,
             'refresh_token': refresh_token}
 

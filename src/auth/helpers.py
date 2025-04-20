@@ -19,9 +19,9 @@ def create_jwt(
         expire_minutes=expire_minutes
     )
 
-def create_access_token(user: Users):
+def create_access_token(user_id: int):
     jwt_payload = {
-        'sub': str(user.id)
+        'sub': str(user_id)
     }
     return create_jwt(
         token_type=ACCESS_TOKEN_TYPE,
@@ -29,9 +29,9 @@ def create_access_token(user: Users):
         expire_minutes=settings.auth_jwt.access_token_expire_minutes
     )
 
-def create_refresh_token(user: Users):
+def create_refresh_token(user_id: int):
     jwt_payload = {
-        'sub': str(user.id)
+        'sub': str(user_id)
     }
     return create_jwt(
         token_type=REFRESH_TOKEN_TYPE,
