@@ -9,17 +9,6 @@ from src.api_v1.users import crud
 
 router = APIRouter(tags=['Auth'], prefix='/auth')
 
-
-@router.post('/refresh')
-async def auth_refresh_jwt(
-        response: Response,
-        user: dict = Depends(refresh_user_access_token),
-):
-    token = create_access_token(user['sub'])
-    response.set_cookie('access_token', token)
-    return {'access_token': token}
-
-
 @router.post('/registration')
 async def create_user(
         user: CreateUserSchema,
@@ -35,3 +24,14 @@ async def login_user(
         session: AsyncSession = Depends(db_helper.session_dependency)
     ):
     return await crud.login_user(session=session, user_in=user, response=response)
+
+
+@router.post('/refresh')
+async def auth_refresh_jwt(
+        response: Response,
+        user: dict = Depends(refresh_user_access_token),
+):
+    token = create_access_token(user['sub'])
+    response.delete_cookie('access_token', secure=True, httponly=True, samesite="lax")
+    response.set_cookie('access_token', token, secure=True, httponly=True, samesite="lax")
+    return {'access_token': token}

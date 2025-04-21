@@ -1,29 +1,28 @@
 from datetime import datetime, time
-from typing import Union, Optional, TYPE_CHECKING
+from typing import Union, TYPE_CHECKING
 
-from sqlalchemy import String, Integer, ForeignKey, Time
+from sqlalchemy import String, Integer, ForeignKey, Time, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
 
 
 if TYPE_CHECKING:
-    from src.core.models.rewards import Rewards
-    from src.core.models import TestsName
+    from src.core.models.rewards import UserReward
+    from src.core.models.tests import TestsName
 
 
 class Users(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    reward_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('rewards.id'), nullable=True)
     number: Mapped[str] = mapped_column(String(12), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255), index=True)
     create_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
     profile: Mapped['Profiles'] = relationship(back_populates='user', uselist=False)
-    reward: Mapped[Optional['Rewards']] = relationship(back_populates='user')
     user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='user')
+    rewards: Mapped[list['UserReward']] = relationship(back_populates='user')
 
 
 class Profiles(Base):
@@ -48,7 +47,11 @@ class UserAttempts(Base):
     count_correct_answer: Mapped[int] = mapped_column(Integer)
     total_questions: Mapped[int] = mapped_column(Integer)
     time_execution: Mapped[time] = mapped_column(Time)
+    score: Mapped[float] = mapped_column(Float)
     complete_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, index=True)
 
     user: Mapped['Users'] = relationship(back_populates='user_attempt')
     test: Mapped['TestsName'] = relationship(back_populates='user_attempt')
+
+
+

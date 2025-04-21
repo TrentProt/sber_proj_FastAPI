@@ -45,9 +45,9 @@ async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: 
             detail="Пароль введен неверно"
         )
     access_token = create_access_token(user.id)
-    response.set_cookie('access_token', access_token, secure=True)
+    response.set_cookie('access_token', access_token, secure=True, httponly=True, samesite='lax')
     refresh_token = create_refresh_token(user.id)
-    response.set_cookie('refresh_token', refresh_token, secure=True)
+    response.set_cookie('refresh_token', refresh_token, secure=True, httponly=True, samesite='lax')
     return {'access_token': access_token,
             'refresh_token': refresh_token}
 

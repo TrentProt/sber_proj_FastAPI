@@ -1,8 +1,16 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models import UserAttempts
 from src.core.models.base import Base
+from src.core.models.rewards import UserReward
+
+
+if TYPE_CHECKING:
+    from src.core.models.users import UserAttempts
+    from src.core.models.rewards import UserReward
 
 class Topics(Base):
     __tablename__ = 'topics'
@@ -11,22 +19,34 @@ class Topics(Base):
     name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(String(255))
 
-    test: Mapped[list['TestsName']] = relationship(back_populates='topic')
+    user_reward: Mapped[list['UserReward']] = relationship(back_populates='topic')
+    section_topic: Mapped[list['SectionsTopic']] = relationship(back_populates='topic')
 
+
+class SectionsTopic(Base):
+    __tablename__ = 'section_topic'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'))
+    title: Mapped[str] = mapped_column(String(255))
+    description: Mapped[str] = mapped_column(String(255))
+
+    topic: Mapped['Topics'] = relationship(back_populates='section_topic')
+    test: Mapped[list['TestsName']] = relationship(back_populates='section_topic')
 
 class TestsName(Base):
     __tablename__ = 'tests'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'), index=True)
+    section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'), index=True)
     title: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str] = mapped_column(String(255))
     # В секундах
     time_test: Mapped[int] = mapped_column(Integer)
 
-    topic: Mapped['Topics'] = relationship(back_populates='test')
     question: Mapped[list['Questions']] = relationship(back_populates='test')
     user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='test')
+    section_topic: Mapped['SectionsTopic'] = relationship(back_populates='test')
 
 
 class Questions(Base):
@@ -49,4 +69,3 @@ class Answers(Base):
     correct: Mapped[bool] = mapped_column(Boolean, index=True)
 
     question: Mapped['Questions'] = relationship(back_populates='answer')
-
