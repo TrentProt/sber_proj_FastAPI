@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api_v1.auth.helpers import create_access_token
 from src.core.models import db_helper
 from src.api_v1.auth.dependencies import refresh_user_access_token
-from src.api_v1.users.schemas import CreateUserSchema, LoginUserSchema
-from src.api_v1.users import crud
+from src.api_v1.auth.schemas import CreateUserSchema, LoginUserSchema
+from src.api_v1.auth import crud
 
 router = APIRouter(tags=['Auth'], prefix='/auth')
 

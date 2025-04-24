@@ -1,5 +1,5 @@
 from contextlib import asynccontextmanager
-
+import json
 import uvicorn
 
 from fastapi import FastAPI
@@ -27,6 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+openapi_schema = app.openapi()
+with open("openapi.json", "w") as f:
+    json.dump(openapi_schema, f)
 
 if __name__ == '__main__':
     uvicorn.run('src.main:app')

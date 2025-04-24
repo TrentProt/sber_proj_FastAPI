@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from src.api_v1.auth.helpers import create_access_token, create_refresh_token
-from src.api_v1.users.schemas import CreateUserSchema, LoginUserSchema
+from src.api_v1.auth.schemas import CreateUserSchema, LoginUserSchema
 from src.core.models.users import Users
 
 import bcrypt
@@ -23,7 +23,7 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
     )
     session.add(user_to_save)
     await session.commit()
-    return {'ok': True, 'used_id': user_to_save.id}
+    return {'used_id': user_to_save.id, 'ok': True}
 
 
 async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: Response):

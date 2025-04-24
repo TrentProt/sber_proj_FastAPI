@@ -1,44 +1,13 @@
-from pydantic import BaseModel, Field, field_validator
-import re
-from typing import Optional
+from typing import Union
 
-class CreateUserSchema(BaseModel):
-    number: str = Field(min_length=11, max_length=12, examples=['string'])
-    password1: str = Field(min_length=8, examples=['string'])
-    password2: str
-
-    @field_validator('number')
-    def validate_number(cls, v: str) -> str:
-        if not re.match(r'^\+?\d{11,12}$', v):
-            raise ValueError('Номер должен содержать 11-12 цифр')
-        return v
-
-    @field_validator('password1')
-    def validate_password_strength(cls, v: str) -> str:
-        if len(v) < 8:
-            raise ValueError('Пароль должен быть не менее 8 символов')
-        if not any(c.isupper() for c in v):
-            raise ValueError('Пароль должен содержать хотя бы одну заглавную букву')
-        if not any(c.isdigit() for c in v):
-            raise ValueError('Пароль должен содержать хотя бы одну цифру')
-        return v
-
-    @field_validator('password2')
-    def passwords_match(cls, v: str, values) -> str:
-        if 'password1' in values.data and v != values.data['password1']:
-            raise ValueError('Пароли не совпадают')
-        return v
-
-class LoginUserSchema(BaseModel):
-    number: str = Field(..., min_length=11, max_length=12)
-    password: str = Field(..., min_length=8)
-
-    @field_validator('number')
-    def validate_number(cls, v: str) -> str:
-        if not re.match(r'^\+?\d{11,12}$', v):
-            raise ValueError('Номер должен содержать 11-12 цифр')
-        return v
+from pydantic import BaseModel
 
 
-class UserSchema(LoginUserSchema):
-    id: int
+class CreateProfile(BaseModel):
+    first_name: str
+    last_name: str
+    middle_name: Union[str, None] = None
+
+
+class UpdateProfile(CreateProfile):
+    bio: Union[str, None] = None
