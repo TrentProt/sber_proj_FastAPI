@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api_v1.users.schemas import CreateProfile, UpdateProfile
+from src.api_v1.users.schemas import CreateProfile, UpdateProfile, GetProfile
 from src.core.models import db_helper
 from src.api_v1.users.dependencies import verify_access_token
 from src.api_v1.users import crud
@@ -13,7 +13,7 @@ router = APIRouter(tags=['Users'], prefix='/users')
 async def profile_user(
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
-):
+) -> GetProfile:
     return await crud.profile_user(session=session, payload=token_payload)
 
 
@@ -32,5 +32,5 @@ async def update_profile_user(
     token_payload: dict = Depends(verify_access_token),
     session: AsyncSession = Depends(db_helper.session_dependency)
 ):
-    return await crud.update_profile(profile=profile, payload=token_payload, session=session)
+    return await crud.update_profile(profile_update=profile, payload=token_payload, session=session)
 

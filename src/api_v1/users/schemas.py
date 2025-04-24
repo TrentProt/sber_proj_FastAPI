@@ -11,3 +11,8 @@ class CreateProfile(BaseModel):
 
 class UpdateProfile(CreateProfile):
     bio: Union[str, None] = None
+
+
+class GetProfile(UpdateProfile):
+    id: int
+    user_id: int

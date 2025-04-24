@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 
-from src.api_v1.users.schemas import CreateProfile, UpdateProfile
+from src.api_v1.users.schemas import CreateProfile, UpdateProfile, GetProfile
 from src.core.models.users import Users, Profiles
 
 
@@ -26,14 +26,23 @@ async def create_profile(profile: CreateProfile,  payload: dict, session: AsyncS
 
 async def profile_user(session: AsyncSession, payload: dict):
     user_id = int(payload.get('sub'))
-    stmt = select(Users).options(joinedload(Users.profile)).where(Users.id == user_id)
-    user = await session.scalar(stmt)
-    return {'ok': user.profile.first_name}
+    stmt = select(Profiles).where(Profiles.user_id == user_id)
+    result = await session.execute(stmt)
+    profile = result.scalar_one_or_none()
+    return profile
 
 
-async def update_profile(profile: UpdateProfile, payload: dict, session: AsyncSession):
+async def update_profile(profile_update: UpdateProfile, payload: dict, session: AsyncSession):
     user_id = int(payload.get('sub'))
     if not user_id:
         raise HTTPException(status_code=401, detail='Invalid token payload')
-    stmt = select(Users).options(joinedload(Users.profile)).where(Users.id == user_id)
-    pass
+    stmt = select(Profiles).where(Profiles.user_id == user_id)
+    result = await session.execute(stmt)
+    profile = result.scalar_one_or_none()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    update_dict = profile_update.model_dump(exclude_unset=True)
+    for field, value in update_dict.items():
+        setattr(profile, field, value)
+    await session.commit()
+    return {"ok": True, "message": "Profile updated"}
