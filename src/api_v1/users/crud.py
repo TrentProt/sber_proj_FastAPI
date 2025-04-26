@@ -21,7 +21,7 @@ async def create_profile(profile: CreateProfile,  payload: dict, session: AsyncS
     )
     session.add(profile_to_save)
     await session.commit()
-    return {'ok': True}
+    return {'ok': True, 'message': 'Profile Create'}
 
 
 async def profile_user(session: AsyncSession, payload: dict):

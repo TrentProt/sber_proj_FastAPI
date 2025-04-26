@@ -1,7 +1,9 @@
+from typing import Dict
+
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api_v1.users.schemas import CreateProfile, UpdateProfile, GetProfile
+from src.api_v1.users.schemas import CreateProfile, UpdateProfile, GetProfile, OkResponse
 from src.core.models import db_helper
 from src.api_v1.users.dependencies import verify_access_token
 from src.api_v1.users import crud
@@ -22,7 +24,7 @@ async def profile_user(
         profile: CreateProfile,
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
-):
+) -> OkResponse:
     return await crud.create_profile(profile=profile, payload=token_payload, session=session)
 
 
@@ -31,6 +33,6 @@ async def update_profile_user(
     profile: UpdateProfile,
     token_payload: dict = Depends(verify_access_token),
     session: AsyncSession = Depends(db_helper.session_dependency)
-):
+) -> OkResponse:
     return await crud.update_profile(profile_update=profile, payload=token_payload, session=session)
 

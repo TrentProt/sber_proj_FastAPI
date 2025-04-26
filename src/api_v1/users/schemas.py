@@ -16,3 +16,7 @@ class UpdateProfile(CreateProfile):
 class GetProfile(UpdateProfile):
     id: int
     user_id: int
+
+class OkResponse(BaseModel):
+    ok: bool
+    message: str

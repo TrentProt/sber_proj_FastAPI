@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 import re
-from typing import Optional
+from typing import Optional, Union
+
 
 class CreateUserSchema(BaseModel):
     number: str = Field(min_length=3, max_length=12, examples=['string'])
@@ -42,3 +43,26 @@ class LoginUserSchema(BaseModel):
 
 class UserSchema(LoginUserSchema):
     id: int
+
+
+class OkResponse(BaseModel):
+    ok: bool
+    message: str
+
+
+class TokensLogin(OkResponse):
+    access_token: str
+    refresh_token: Union[str, None]
+
+
+class RegistrationUserResponse(OkResponse):
+    user_id: int
+
+
+class CheckAuth(BaseModel):
+    is_authenticated: bool
+    user_id: Union[int, None]
+    first_name: Union[str, None]
+    last_name: Union[str, None]
+    middle_name: Union[str, None]
+
