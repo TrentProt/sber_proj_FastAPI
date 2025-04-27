@@ -6,7 +6,7 @@ from src.api_v1.auth.helpers import create_access_token
 from src.core.models import db_helper
 from src.api_v1.auth.dependencies import refresh_user_access_token
 from src.api_v1.auth.schemas import (
-    CreateUserSchema, LoginUserSchema, OkResponse,
+    CreateUserSchema, LoginUserSchema,
     TokensLogin, RegistrationUserResponse, CheckAuth
 )
 from src.api_v1.auth import crud
@@ -16,7 +16,7 @@ router = APIRouter(tags=['Auth'], prefix='/auth')
 @router.post('/registration')
 async def create_user(
         user: CreateUserSchema,
-        session: AsyncSession = Depends(db_helper.session_dependency,),
+        session: AsyncSession = Depends(db_helper.session_dependency),
     ) -> RegistrationUserResponse:
     return await crud.create_user(session=session, user_in=user)
 
@@ -47,7 +47,7 @@ async def auth_refresh_jwt(
 
 
 @router.get('/check_auth', response_model_exclude_none=True)
-async def check_auth_user(
+async def check_auth_user_and_get_datauser(
         request: Request,
         session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> CheckAuth:

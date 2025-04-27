@@ -1,18 +1,16 @@
-from typing import Dict
-
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.users.schemas import CreateProfile, UpdateProfile, GetProfile, OkResponse
+from src.core.dependencies import verify_access_token
 from src.core.models import db_helper
-from src.api_v1.users.dependencies import verify_access_token
 from src.api_v1.users import crud
 
 router = APIRouter(tags=['Users'], prefix='/users')
 
 
 @router.get('/profile')
-async def profile_user(
+async def get_profile_user(
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> GetProfile:
@@ -20,7 +18,7 @@ async def profile_user(
 
 
 @router.post('/profile/create')
-async def profile_user(
+async def create_profile_user(
         profile: CreateProfile,
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)

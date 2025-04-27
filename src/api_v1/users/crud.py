@@ -1,11 +1,10 @@
-from fastapi import HTTPException, Response
+from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
 
-from src.api_v1.users.schemas import CreateProfile, UpdateProfile, GetProfile
-from src.core.models.users import Users, Profiles
+from src.api_v1.users.schemas import CreateProfile, UpdateProfile
+from src.core.models.users import Profiles
 
 
 async def create_profile(profile: CreateProfile,  payload: dict, session: AsyncSession):

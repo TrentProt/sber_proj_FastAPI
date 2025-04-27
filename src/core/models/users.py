@@ -47,7 +47,7 @@ class UserAttempts(Base):
     count_correct_answer: Mapped[int] = mapped_column(Integer)
     total_questions: Mapped[int] = mapped_column(Integer)
     time_execution: Mapped[time] = mapped_column(Time)
-    score: Mapped[float] = mapped_column(Float)
+    score: Mapped[int] = mapped_column(Integer)
     complete_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, index=True)
 
     user: Mapped['Users'] = relationship(back_populates='user_attempt')
