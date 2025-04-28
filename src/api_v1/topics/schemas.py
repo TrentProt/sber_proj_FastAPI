@@ -7,8 +7,8 @@ class SectionTopicOut(BaseModel):
     id: int
     title: str
     description: str
-    tests_count: int
-    solved_tests: int
+    test_count: int
+    solved_count: int
 
 
 
