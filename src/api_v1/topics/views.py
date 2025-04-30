@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.topics import crud
 from src.api_v1.topics.dependencies import get_id_user_or_none_from_cookie
-from src.api_v1.topics.schemas import TopicOut
+from src.api_v1.topics.schemas import TopicOut, SectionForTests
 from src.core.models import db_helper
 
 
@@ -26,7 +26,7 @@ async def get_section_and_tests_in_section(
         section_topic_id: int,
         user_id: Union[str, None] = Depends(get_id_user_or_none_from_cookie),
         session: AsyncSession = Depends(db_helper.session_dependency)
-):
+) -> SectionForTests:
     return await crud.get_section_and_tests(
         user_id=user_id,
         section_topic_id=section_topic_id,

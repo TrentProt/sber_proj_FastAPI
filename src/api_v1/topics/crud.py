@@ -5,7 +5,7 @@ from typing import Union
 
 from fastapi import HTTPException, UploadFile
 
-from sqlalchemy import select, func, and_, distinct
+from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -95,12 +95,51 @@ async def get_section_and_tests(
     if not section:
         raise HTTPException(status_code=404, detail='Page not found')
 
+    solved_test_count = 0
+    solved_question_map = {}
+    if user_id:
+        solved_count_stmt = select(
+            func.count(UserAttempts.test_id)
+        ).where(
+            and_(
+                UserAttempts.user_id == int(user_id),
+                UserAttempts.score == 100
+            )
+        )
+        solved_test_count = (await session.execute(solved_count_stmt)).scalar()
+        # ========================
+        solved_question_stmt = select(
+            TestsName.id,
+            UserAttempts.count_correct_answer
+        ).join(
+            TestsName.user_attempt
+        ).where(
+            UserAttempts.user_id == int(user_id)
+        )
+        solved_question = (await session.execute(solved_question_stmt)).all()
+        solved_question_map = {test_id: count_correct_question for test_id, count_correct_question
+                               in solved_question}
+
     section_data = {
         'id': section.id,
         'title': section.title,
         'description': section.description,
-        'tests': section.test
+        'count_solved': solved_test_count,
+        'count_tests': len(section.test),
+        'theory': '?',
+        'tests': []
     }
+
+    for test in section.test:
+        test_data = {
+            'id': test.id,
+            'title': test.title,
+            'description': test.description,
+            'status': '?',
+            'count_solved': solved_question_map.get(test.id, 0),
+            'count_questions': test.count_question
+        }
+        section_data['tests'].append(test_data)
 
     return section_data
 
