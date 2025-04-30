@@ -1,6 +1,9 @@
+import os
+import uuid
+from pathlib import Path
 from typing import Union
 
-from fastapi import HTTPException
+from fastapi import HTTPException, UploadFile
 
 from sqlalchemy import select, func, and_, distinct
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,6 +11,11 @@ from sqlalchemy.orm import joinedload
 
 from src.core.models.users import UserAttempts
 from src.core.models.tests import Topics, TestsName, SectionsTopic
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+SECTION_TOPIC_IMG_DIR = BASE_DIR / "src" / "static" / "images" / "sections_topics"
+SECTION_TOPIC_IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 async def get_topics_and_sections_crud(
@@ -62,6 +70,7 @@ async def get_topics_and_sections_crud(
                 'id': section.id,
                 'title': section.title,
                 'description': section.description,
+                'icon': section.img_url if section.img_url else '',
                 'test_count': test_count_map.get(section.id, 0),
                 'solved_count': solved_count_map.get(section.id, 0) if user_id else 0
             }
@@ -94,4 +103,35 @@ async def get_section_and_tests(
     }
 
     return section_data
+
+
+async def upload_image_section_topic(
+        section_topic_id: int,
+        file: UploadFile,
+        session: AsyncSession
+):
+    stmt = select(SectionsTopic).where(SectionsTopic.id == section_topic_id)
+    result = await session.execute(stmt)
+    section_topic = result.scalar_one_or_none()
+
+    if not section_topic:
+        raise HTTPException(status_code=404, detail='Page not found')
+
+    file_ext = os.path.splitext(file.filename)[1]
+    filename = f"{uuid.uuid4()}{file_ext}"
+    file_path = SECTION_TOPIC_IMG_DIR / filename
+
+    content = await file.read()
+    with open(file_path, "wb") as image:
+        image.write(content)
+
+    section_topic.img_url = f"/static/images/story/{filename}"
+    await session.commit()
+    await session.refresh(section_topic)
+    return {
+        "status": "success",
+        "message": "Image uploaded successfully",
+        "img_url": section_topic.img_url
+    }
+
 

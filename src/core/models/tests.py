@@ -18,6 +18,7 @@ class Topics(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(String(255))
+    img_url: Mapped[str] = mapped_column(String(255), nullable=True)
 
     user_reward: Mapped[list['UserReward']] = relationship(back_populates='topic')
     section_topic: Mapped[list['SectionsTopic']] = relationship(back_populates='topic')
@@ -30,6 +31,7 @@ class SectionsTopic(Base):
     topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'))
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(String(255))
+    img_url: Mapped[str] = mapped_column(String(255), nullable=True)
 
     topic: Mapped['Topics'] = relationship(back_populates='section_topic')
     test: Mapped[list['TestsName']] = relationship(back_populates='section_topic')
@@ -41,10 +43,11 @@ class TestsName(Base):
     section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'), index=True)
     title: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str] = mapped_column(String(255))
+    count_question: Mapped[int] = mapped_column(Integer, nullable=True)
     # В секундах
     time_test: Mapped[int] = mapped_column(Integer)
 
-    question: Mapped[list['Questions']] = relationship(back_populates='test')
+    questions: Mapped[list['Questions']] = relationship(back_populates='test')
     user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='test')
     section_topic: Mapped['SectionsTopic'] = relationship(back_populates='test')
 
@@ -56,7 +59,7 @@ class Questions(Base):
     test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'), index=True)
     question_text: Mapped[str] = mapped_column(String(255), unique=True)
 
-    test: Mapped['TestsName'] = relationship(back_populates='question')
+    test: Mapped['TestsName'] = relationship(back_populates='questions')
     answer: Mapped[list['Answers']] = relationship(back_populates='question')
 
 

@@ -26,7 +26,7 @@ def upgrade() -> None:
     sa.Column('topic_id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=False),
-    sa.ForeignKeyConstraint(['topic_id'], ['topics.id'], ),
+    sa.ForeignKeyConstraint(['topic_id'], ['sections_topics.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user_reward',
@@ -35,7 +35,7 @@ def upgrade() -> None:
     sa.Column('topic_id', sa.Integer(), nullable=False),
     sa.Column('reward_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['reward_id'], ['rewards.id'], ),
-    sa.ForeignKeyConstraint(['topic_id'], ['topics.id'], ),
+    sa.ForeignKeyConstraint(['topic_id'], ['sections_topics.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -44,7 +44,7 @@ def upgrade() -> None:
     op.drop_index('ix_tests_topic_id', table_name='tests')
     op.create_index(op.f('ix_tests_section_topic_id'), 'tests', ['section_topic_id'], unique=False)
     op.drop_constraint('tests_topic_id_fkey', 'tests', type_='foreignkey')
-    op.create_foreign_key(None, 'tests', 'topics', ['section_topic_id'], ['id'])
+    op.create_foreign_key(None, 'tests', 'sections_topics', ['section_topic_id'], ['id'])
     op.drop_column('tests', 'topic_id')
     op.add_column('user_attempts', sa.Column('score', sa.Float(), nullable=False))
     op.drop_constraint('users_reward_id_fkey', 'users', type_='foreignkey')
@@ -60,7 +60,7 @@ def downgrade() -> None:
     op.drop_column('user_attempts', 'score')
     op.add_column('tests', sa.Column('topic_id', sa.INTEGER(), autoincrement=False, nullable=False))
     op.drop_constraint(None, 'tests', type_='foreignkey')
-    op.create_foreign_key('tests_topic_id_fkey', 'tests', 'topics', ['topic_id'], ['id'])
+    op.create_foreign_key('tests_topic_id_fkey', 'tests', 'sections_topics', ['topic_id'], ['id'])
     op.drop_index(op.f('ix_tests_section_topic_id'), table_name='tests')
     op.create_index('ix_tests_topic_id', 'tests', ['topic_id'], unique=False)
     op.drop_column('tests', 'section_topic_id')

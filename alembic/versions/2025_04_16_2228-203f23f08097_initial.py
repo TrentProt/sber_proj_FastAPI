@@ -29,7 +29,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
-    op.create_table('topics',
+    op.create_table('sections_topics',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=False),
@@ -42,7 +42,7 @@ def upgrade() -> None:
     sa.Column('title', sa.String(length=255), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=False),
     sa.Column('time_test', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['topic_id'], ['topics.id'], ),
+    sa.ForeignKeyConstraint(['topic_id'], ['sections_topics.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_tests_title'), 'tests', ['title'], unique=False)
@@ -124,6 +124,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_tests_topic_id'), table_name='tests')
     op.drop_index(op.f('ix_tests_title'), table_name='tests')
     op.drop_table('tests')
-    op.drop_table('topics')
+    op.drop_table('sections_topics')
     op.drop_table('rewards')
     # ### end Alembic commands ###
