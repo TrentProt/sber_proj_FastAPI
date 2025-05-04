@@ -60,7 +60,7 @@ class Questions(Base):
     question_text: Mapped[str] = mapped_column(String(255), unique=True)
 
     test: Mapped['TestsName'] = relationship(back_populates='questions')
-    answer: Mapped[list['Answers']] = relationship(back_populates='question')
+    answers: Mapped[list['Answers']] = relationship(back_populates='question')
 
 
 class Answers(Base):
@@ -71,4 +71,4 @@ class Answers(Base):
     answer_text: Mapped[str] = mapped_column(String(255))
     correct: Mapped[bool] = mapped_column(Boolean, index=True)
 
-    question: Mapped['Questions'] = relationship(back_populates='answer')
+    question: Mapped['Questions'] = relationship(back_populates='answers')

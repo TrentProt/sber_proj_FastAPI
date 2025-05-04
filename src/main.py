@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
+
 import json
+
 from pathlib import Path
 
 import uvicorn
+
+import redis
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

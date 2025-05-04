@@ -11,7 +11,7 @@ from src.core.models import db_helper
 
 
 
-router = APIRouter(tags=['Topics and Sections of the sections_topics'])
+router = APIRouter(tags=['Topics and Sections for main'])
 
 @router.get('/sections_topics')
 async def get_topics_and_sections_for_main_page(
