@@ -27,7 +27,7 @@ async def get_random_questions(
     attempts_count = (await session.execute(stmt_check)).scalar()
     if attempts_count > 0:
         return {
-            'status': 'success',
+            'ok': True,
             'test_was_passed': True,
             'message': 'Test was passed'
         }
@@ -129,7 +129,8 @@ async def get_qa_for_test(
     select_3_wrong_1_correct = random.sample(wrong_answer_id, 3) + correct_answer_id
     random.shuffle(select_3_wrong_1_correct)
     return {
-        'id': question.id,
+        'q_num': int(q_num),
+        'question_id': question.id,
         'question': question.question_text,
         'answers': [
             {
@@ -299,15 +300,15 @@ async def get_result_test(
         user_answer = next((a for a in question.answers if a.id == answer['answer_id']), None)
 
         response_data['data_answers'].append({
-            'q_num': answer['q_num'],
+            'q_num': int(answer['q_num']),
             'question_text': question.question_text,
             'user_answer': {
-                'id': answer['answer_id'],
+                'id': int(answer['answer_id']),
                 'answer_text': user_answer.answer_text
             },
-            'is_correct': answer['is_correct'],
+            'is_correct': bool(answer['is_correct']),
             'correct_answer': {
-                'id': answer['correct_answer_id'],
+                'id': int(answer['correct_answer_id']),
                 'correct_answer_text': correct_answer.answer_text
             }
         })
