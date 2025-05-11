@@ -18,7 +18,6 @@ class Topics(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(String(255))
-    # img_url: Mapped[str] = mapped_column(String(255), nullable=True)
 
     user_reward: Mapped[list['UserReward']] = relationship(back_populates='topic')
     section_topic: Mapped[list['SectionsTopic']] = relationship(back_populates='topic')
@@ -41,6 +40,7 @@ class TestsName(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'), index=True)
+    type_test: Mapped[str] = mapped_column(String(20), nullable=True)
     title: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str] = mapped_column(String(255))
     count_question: Mapped[int] = mapped_column(Integer, nullable=True)

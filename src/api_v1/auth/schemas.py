@@ -61,8 +61,8 @@ class RegistrationUserResponse(OkResponse):
 
 class CheckAuth(BaseModel):
     is_authenticated: bool
-    user_id: Union[int, None]
-    first_name: Union[str, None]
-    last_name: Union[str, None]
-    middle_name: Union[str, None]
+    user_id: Union[int, None] = None
+    first_name: Union[str, None] = None
+    last_name: Union[str, None] = None
+    middle_name: Union[str, None] = None
 

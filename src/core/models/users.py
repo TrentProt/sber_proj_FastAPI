@@ -45,13 +45,9 @@ class UserAttempts(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), index=True)
     test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'), index=True)
     count_correct_answer: Mapped[int] = mapped_column(Integer)
-    time_execution: Mapped[time] = mapped_column(Time)
+    time_execution: Mapped[int] = mapped_column(Integer, nullable=True)
     score: Mapped[int] = mapped_column(Integer)
     complete_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, index=True)
-
-    __table_args__ = (
-        UniqueConstraint('user_id', 'test_id'),
-    )
 
     user: Mapped['Users'] = relationship(back_populates='user_attempt')
     test: Mapped['TestsName'] = relationship(back_populates='user_attempt')
