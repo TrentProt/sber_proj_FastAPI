@@ -7,7 +7,7 @@ from src.core.models import db_helper
 from src.api_v1.auth.dependencies import refresh_user_access_token
 from src.api_v1.auth.schemas import (
     CreateUserSchema, LoginUserSchema,
-    TokensLogin, RegistrationUserResponse, CheckAuth
+    TokensLogin, CheckAuth, OkResponse
 )
 from src.api_v1.auth import crud
 
@@ -17,7 +17,7 @@ router = APIRouter(tags=['Auth'], prefix='/auth')
 async def create_user(
         user: CreateUserSchema,
         session: AsyncSession = Depends(db_helper.session_dependency),
-    ) -> RegistrationUserResponse:
+    ) -> OkResponse:
     return await crud.create_user(session=session, user_in=user)
 
 

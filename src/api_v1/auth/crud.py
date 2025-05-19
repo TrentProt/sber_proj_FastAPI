@@ -28,7 +28,6 @@ async def create_user(session: AsyncSession, user_in: CreateUserSchema):
     await session.commit()
     return {
         'ok': True,
-        'used_id': user_to_save.id,
         'message': 'Registration success'
     }
 

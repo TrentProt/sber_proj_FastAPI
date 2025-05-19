@@ -49,7 +49,7 @@ async def get_topics_and_sections_crud(
             UserAttempts, UserAttempts.test_id == TestsName.id
         ).where(
             UserAttempts.user_id == int(user_id),
-            UserAttempts.score == 100,
+            UserAttempts.score >= 75,
             TestsName.section_topic_id.in_(sections_id)
         ).group_by(
             TestsName.section_topic_id
@@ -103,7 +103,7 @@ async def get_section_and_tests(
         ).where(
             and_(
                 UserAttempts.user_id == int(user_id),
-                UserAttempts.score == 100
+                UserAttempts.score >= 75
             )
         )
         solved_test_count = (await session.execute(solved_count_stmt)).scalar()
@@ -135,6 +135,7 @@ async def get_section_and_tests(
             'id': test.id,
             'title': test.title,
             'description': test.description,
+            'type_test': test.type_test,
             'status': '?',
             'count_solved': solved_question_map.get(test.id, 0),
             'count_questions': test.count_question

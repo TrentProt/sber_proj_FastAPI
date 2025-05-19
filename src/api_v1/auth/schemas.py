@@ -55,10 +55,6 @@ class TokensLogin(OkResponse):
     refresh_token: Union[str, None]
 
 
-class RegistrationUserResponse(OkResponse):
-    user_id: int
-
-
 class CheckAuth(BaseModel):
     is_authenticated: bool
     user_id: Union[int, None] = None

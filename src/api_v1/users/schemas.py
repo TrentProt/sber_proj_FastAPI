@@ -1,7 +1,13 @@
-from typing import Union
+from typing import Union, List
 
 from pydantic import BaseModel
 
+
+class HistoryTestSchema(BaseModel):
+    id: int
+    title: str
+    time_execution: int
+    score: int
 
 class CreateProfile(BaseModel):
     first_name: str
@@ -15,7 +21,7 @@ class UpdateProfile(CreateProfile):
 
 class GetProfile(UpdateProfile):
     id: int
-    user_id: int
+    history_test: List[HistoryTestSchema]
 
 class OkResponse(BaseModel):
     ok: bool

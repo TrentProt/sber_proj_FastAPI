@@ -1,7 +1,7 @@
-from datetime import datetime, time
+from datetime import datetime
 from typing import Union, TYPE_CHECKING
-
-from sqlalchemy import String, Integer, ForeignKey, Time, Float, UniqueConstraint
+from sqlalchemy.sql import func
+from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
@@ -18,7 +18,7 @@ class Users(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     number: Mapped[str] = mapped_column(String(12), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255), index=True)
-    create_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    create_at: Mapped[datetime] = mapped_column(default=func.now())
 
     profile: Mapped['Profiles'] = relationship(back_populates='user', uselist=False)
     user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='user')
@@ -47,7 +47,7 @@ class UserAttempts(Base):
     count_correct_answer: Mapped[int] = mapped_column(Integer)
     time_execution: Mapped[int] = mapped_column(Integer, nullable=True)
     score: Mapped[int] = mapped_column(Integer)
-    complete_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, index=True)
+    complete_at: Mapped[datetime] = mapped_column(default=func.now(), index=True)
 
     user: Mapped['Users'] = relationship(back_populates='user_attempt')
     test: Mapped['TestsName'] = relationship(back_populates='user_attempt')
