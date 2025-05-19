@@ -1,18 +1,18 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api_v1.tests import crud, service
-from src.api_v1.tests.schemas import AddUserAttempt, GetTestSchema, GetQuestionAndAnswersSchema, \
+from src.api_v1.tests import crud
+from src.api_v1.tests.schemas import AddUserAttempt, GetQuestionAndAnswersSchema, \
     StartFinishTestSchema, ResultTestSchema
 from src.core.dependencies import verify_access_token
 from src.core.models import db_helper
 
 
-router = APIRouter(tags=['Tests with RANDOM q&a'], prefix='/random_tests')
+router = APIRouter(tags=['Random tests'], prefix='/tests')
 
 
 @router.get('/{test_id}/start')
-async def generate_question_for_test(
+async def generate_questions(
         test_id: int,
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -25,21 +25,10 @@ async def generate_question_for_test(
     )
 
 
-@router.get('/{test_id}')
-async def get_test(
+@router.get('/{test_id}/question/{q_num}')
+async def get_question_answers(
         test_id: int,
-        session: AsyncSession = Depends(db_helper.session_dependency)
-) -> GetTestSchema:
-    return await crud.get_test(
-        test_id=test_id,
-        session=session
-    )
-
-
-@router.get('/{test_id}/question/{question_id}')
-async def get_question_answers_for_test(
         q_num: int,
-        test_id: int,
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> GetQuestionAndAnswersSchema:

@@ -79,7 +79,10 @@ async def get_test(
         session: AsyncSession
 ):
     stmt = select(TestsName).where(
-        TestsName.id == test_id
+        and_(
+            TestsName.id == test_id,
+            TestsName.type_test == 'random'
+        )
     )
     test = (await session.execute(stmt)).scalar_one_or_none()
     if not test:

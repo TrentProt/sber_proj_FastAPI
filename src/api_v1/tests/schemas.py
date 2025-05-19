@@ -20,14 +20,6 @@ class StartFinishTestSchema(BaseModel):
     message: str
 
 
-class GetTestSchema(BaseModel):
-    id: int
-    title: str
-    description: str
-    time_test: int
-    questions_count: int
-
-
 class AnswerSchema(BaseModel):
     id: int
     answer_text: str

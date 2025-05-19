@@ -23,6 +23,7 @@ class TopicOut(BaseModel):
 class Tests(BaseModel):
     id: int
     title: str
+    type_test: str
     description: str
     status: str
     count_solved: int
