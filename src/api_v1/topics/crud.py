@@ -9,6 +9,7 @@ from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+from src.core.models import UserAttemptsCase, Cases
 from src.core.models.users import UserAttempts
 from src.core.models.tests import Topics, TestsName, SectionsTopic
 
@@ -18,11 +19,76 @@ SECTION_TOPIC_IMG_DIR = BASE_DIR / "src" / "static" / "images" / "sections_topic
 SECTION_TOPIC_IMG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-async def get_topics_and_sections_crud(
+async def get_topics(
+        session: AsyncSession
+):
+    topics_stmt = select(Topics)
+    topics_result = await session.execute(topics_stmt)
+    topics = topics_result.unique().scalars().all()
+    return [
+        {
+        'id': topic.id,
+        'name': topic.name,
+    } for topic in topics
+    ]
+    # sections_id = [section.id for topic in topics for section in topic.section_topic]
+    #
+    # test_count_stmt = select(
+    #     TestsName.section_topic_id,
+    #     func.count(TestsName.id).label('test_count')
+    # ).where(
+    #     TestsName.section_topic_id.in_(sections_id)
+    # ).group_by(
+    #     TestsName.section_topic_id
+    # )
+    #
+    # test_count = (await session.execute(test_count_stmt)).all()
+    # test_count_map = {section_id: count for section_id, count in test_count}
+    #
+    # solved_count_map = {}
+    # if user_id:
+    #     solved_count_stmt = select(
+    #         TestsName.section_topic_id,
+    #         func.count(UserAttempts.test_id).label('solved_test')
+    #     ).join(
+    #         UserAttempts, UserAttempts.test_id == TestsName.id
+    #     ).where(
+    #         UserAttempts.user_id == int(user_id),
+    #         UserAttempts.score >= 75,
+    #         TestsName.section_topic_id.in_(sections_id)
+    #     ).group_by(
+    #         TestsName.section_topic_id
+    #     )
+    #     solved_count = (await session.execute(solved_count_stmt)).all()
+    #     solved_count_map = {section_id: count for section_id, count in solved_count}
+    #
+    # response = []
+    # for topic in topics:
+    #     topic_data = {
+    #         'id': topic.id,
+    #         'name': topic.name,
+    #         'description': topic.description,
+    #         'sections_topic': []
+    #     }
+    #     for section in topic.section_topic:
+    #         section_data = {
+    #             'id': section.id,
+    #             'title': section.title,
+    #             'description': section.description,
+    #             'icon': section.img_url if section.img_url else '',
+    #             'test_count': test_count_map.get(section.id, 0),
+    #             'solved_count': solved_count_map.get(section.id, 0) if user_id else 0
+    #         }
+    #         topic_data['sections_topic'].append(section_data)
+    #     response.append(topic_data)
+
+async def get_sections_topics_crud(
         user_id: Union[str, None],
         session: AsyncSession
 ):
-    topics_stmt = select(Topics).options(joinedload(Topics.section_topic))
+    topics_stmt = select(Topics).options(joinedload(
+        Topics.section_topic
+    ))
     topics_result = await session.execute(topics_stmt)
     topics = topics_result.unique().scalars().all()
 
@@ -61,20 +127,28 @@ async def get_topics_and_sections_crud(
     for topic in topics:
         topic_data = {
             'id': topic.id,
-            'name': topic.name,
-            'description': topic.description,
-            'sections_topic': []
+            'sections_topic': [],
+            'section_case': []
         }
         for section in topic.section_topic:
-            section_data = {
-                'id': section.id,
-                'title': section.title,
-                'description': section.description,
-                'icon': section.img_url if section.img_url else '',
-                'test_count': test_count_map.get(section.id, 0),
-                'solved_count': solved_count_map.get(section.id, 0) if user_id else 0
-            }
-            topic_data['sections_topic'].append(section_data)
+            if section.type == 'test':
+                section_data = {
+                    'id': section.id,
+                    'title': section.title,
+                    'description': section.description,
+                    'icon': section.img_url if section.img_url else '',
+                    'test_count': test_count_map.get(section.id, 0),
+                    'solved_count': solved_count_map.get(section.id, 0) if user_id else 0
+                }
+                topic_data['sections_topic'].append(section_data)
+            else:
+                section_case_data = {
+                    'id': section.id,
+                    'title': section.title,
+                    'description': section.description,
+                    'icon': section.img_url
+                }
+                topic_data['section_case'].append(section_case_data)
         response.append(topic_data)
     return response
 
@@ -84,9 +158,12 @@ async def get_section_and_tests(
     section_topic_id: int,
     session: AsyncSession
 ):
+
     stmt = (
         select(SectionsTopic)
         .options(joinedload(SectionsTopic.test))
+        .options(joinedload(SectionsTopic.case))
+        .options(joinedload(SectionsTopic.theories))
         .where(SectionsTopic.id == section_topic_id)
     )
     result = await session.execute(stmt)
@@ -97,28 +174,43 @@ async def get_section_and_tests(
 
     solved_test_count = 0
     solved_question_map = {}
+    solved_case_map = {}
     if user_id:
-        solved_count_stmt = select(
-            func.count(UserAttempts.test_id)
-        ).where(
-            and_(
-                UserAttempts.user_id == int(user_id),
-                UserAttempts.score >= 75
+        if section.type == 'test':
+            solved_count_stmt = select(
+                func.count(UserAttempts.test_id)
+            ).where(
+                and_(
+                    UserAttempts.user_id == int(user_id),
+                    UserAttempts.score >= 75
+                )
             )
-        )
-        solved_test_count = (await session.execute(solved_count_stmt)).scalar()
-        # ========================
-        solved_question_stmt = select(
-            TestsName.id,
-            UserAttempts.count_correct_answer
-        ).join(
-            TestsName.user_attempt
-        ).where(
-            UserAttempts.user_id == int(user_id)
-        )
-        solved_question = (await session.execute(solved_question_stmt)).all()
-        solved_question_map = {test_id: count_correct_question for test_id, count_correct_question
-                               in solved_question}
+            solved_test_count = (await session.execute(solved_count_stmt)).scalar()
+            # ========================
+            solved_question_stmt = select(
+                TestsName.id,
+                UserAttempts.count_correct_answer
+            ).join(
+                TestsName.user_attempt
+            ).where(
+                UserAttempts.user_id == int(user_id)
+            )
+            solved_question = (await session.execute(solved_question_stmt)).all()
+            solved_question_map = {test_id: count_correct_question for test_id, count_correct_question
+                                   in solved_question}
+        else:
+            solved_case_stmt = select(
+                Cases.id,
+                func.count(UserAttemptsCase.id),
+            ).join(
+                Cases.user_attempts_case
+            ).where(
+                UserAttemptsCase.user_id == int(user_id)
+            ).group_by(
+                Cases.id
+            )
+            solved_case = (await session.execute(solved_case_stmt)).all()
+            solved_case_map = {case_id: count_att for case_id, count_att in solved_case}
 
     section_data = {
         'id': section.id,
@@ -126,22 +218,39 @@ async def get_section_and_tests(
         'description': section.description,
         'count_solved': solved_test_count,
         'count_tests': len(section.test),
-        'theory': '?',
-        'tests': []
+        'theory': [
+            {
+                'id': theory.id,
+                'sources': theory.book,
+                'link': theory.link
+            }
+            for theory in section.theories
+        ],
+        'tests': [],
+        'case': []
     }
-
-    for test in section.test:
-        test_data = {
-            'id': test.id,
-            'title': test.title,
-            'description': test.description,
-            'type_test': test.type_test,
-            'status': '?',
-            'count_solved': solved_question_map.get(test.id, 0),
-            'count_questions': test.count_question
-        }
-        section_data['tests'].append(test_data)
-
+    if section.type == 'test':
+        for test in section.test:
+            test_data = {
+                'id': test.id,
+                'title': test.title,
+                'description': test.description,
+                'type_test': test.type_test,
+                'status': True if solved_question_map.get(test.id, None) else False,
+                'count_solved': solved_question_map.get(test.id, 0),
+                'count_questions': test.count_question
+            }
+            section_data['tests'].append(test_data)
+    else:
+        for case in section.case:
+            case_data = {
+                'id': case.id,
+                'title': case.title,
+                'description': case.description,
+                'icon': case.icon,
+                'status': True if solved_case_map.get(case.id, None) else False
+            }
+            section_data['case'].append(case_data)
     return section_data
 
 

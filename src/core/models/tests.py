@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING
 from sqlalchemy import Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.core.models import UserAttempts
 from src.core.models.base import Base
 from src.core.models.rewards import UserReward
-
 
 if TYPE_CHECKING:
     from src.core.models.users import UserAttempts
     from src.core.models.rewards import UserReward
+    from src.core.models.cases import Cases
+    from src.core.models.theories import TheoriesTable
 
 class Topics(Base):
     __tablename__ = 'topics'
@@ -31,9 +31,13 @@ class SectionsTopic(Base):
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(String(255))
     img_url: Mapped[str] = mapped_column(String(255), nullable=True)
+    type: Mapped[str] = mapped_column(String(255), nullable=True)
 
     topic: Mapped['Topics'] = relationship(back_populates='section_topic')
     test: Mapped[list['TestsName']] = relationship(back_populates='section_topic')
+    case: Mapped[list['Cases']] = relationship(back_populates='section_topic')
+    theories: Mapped[list['TheoriesTable']] = relationship(back_populates='section_topic')
+
 
 class TestsName(Base):
     __tablename__ = 'tests'
@@ -72,3 +76,9 @@ class Answers(Base):
     correct: Mapped[bool] = mapped_column(Boolean, index=True)
 
     question: Mapped['Questions'] = relationship(back_populates='answers')
+
+
+class Theories(Base):
+    __tablename__ = 'theories'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)

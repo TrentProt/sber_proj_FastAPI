@@ -3,10 +3,10 @@ import re
 from typing import Optional, Union
 
 
-class CreateUserSchema(BaseModel):
-    number: str = Field(min_length=3, max_length=12, examples=['string'])
-    password1: str = Field(min_length=3, examples=['string'])
-    password2: str
+# class CreateUserSchema(BaseModel):
+#     number: str = Field(min_length=3, max_length=12, examples=['string'])
+#     password1: str = Field(min_length=3, examples=['string'])
+#     password2: str
 
     # @field_validator('number')
     # def validate_number(cls, v: str) -> str:
@@ -31,10 +31,10 @@ class CreateUserSchema(BaseModel):
     #     return v
 
 class LoginUserSchema(BaseModel):
-    number: str = Field(..., min_length=3, max_length=12)
+    username: str = Field(..., min_length=1, max_length=40)
     password: str = Field(..., min_length=3)
 
-    # @field_validator('number')
+    # @field_validator('user')
     # def validate_number(cls, v: str) -> str:
     #     if not re.match(r'^\+?\d{11,12}$', v):
     #         raise ValueError('Номер должен содержать 11-12 цифр')
@@ -48,11 +48,6 @@ class UserSchema(LoginUserSchema):
 class OkResponse(BaseModel):
     ok: bool
     message: str
-
-
-class TokensLogin(OkResponse):
-    access_token: str
-    refresh_token: Union[str, None]
 
 
 class CheckAuth(BaseModel):

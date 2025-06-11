@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from typing import List
+from typing import List, Union
 
 
 class SectionTopicOutForTopic(BaseModel):
@@ -13,19 +13,18 @@ class SectionTopicOutForTopic(BaseModel):
 
 
 
-class TopicOut(BaseModel):
+class TopicsOut(BaseModel):
     id: int
     name: str
-    description: str
-    sections_topic: List[SectionTopicOutForTopic]
+
 
 
 class Tests(BaseModel):
     id: int
     title: str
-    type_test: str
+    type_test: Union[str, None]
     description: str
-    status: str
+    status: bool
     count_solved: int
     count_questions: int
 

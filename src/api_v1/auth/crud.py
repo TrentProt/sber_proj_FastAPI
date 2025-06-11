@@ -1,44 +1,38 @@
 from fastapi import HTTPException, Response
-from pyexpat.errors import messages
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from src.api_v1.auth.helpers import create_access_token, create_refresh_token
-from src.api_v1.auth.schemas import CreateUserSchema, LoginUserSchema
+from src.api_v1.auth.schemas import LoginUserSchema
 from src.api_v1.auth.utils import decode_jwt
 from src.core.models import Profiles
 from src.core.models.users import Users
 
 import bcrypt
 
-async def create_user(session: AsyncSession, user_in: CreateUserSchema):
-    user = user_in.model_dump()
-    if user['password1'] != user['password2']:
-        raise HTTPException(status_code=401, detail='Пароли не совпадают')
-    if user["number"][:2] == '+7':
-        number = user['number'].replace('+7', '8')
-    else:
-        number = user['number']
-    user_to_save = Users(
-        number=number,
-        password=bcrypt.hashpw(user['password1'].encode('utf-8'), bcrypt.gensalt(rounds=4)).decode('utf-8'),
-    )
-    session.add(user_to_save)
-    await session.commit()
-    return {
-        'ok': True,
-        'message': 'Registration success'
-    }
+# async def create_user(session: AsyncSession, user_in: CreateUserSchema):
+#     user = user_in.model_dump()
+#     if user['password1'] != user['password2']:
+#         raise HTTPException(status_code=401, detail='Пароли не совпадают')
+#     if user["number"][:2] == '+7':
+#         number = user['number'].replace('+7', '8')
+#     else:
+#         number = user['number']
+#     user_to_save = Users(
+#         number=number,
+#         password=bcrypt.hashpw(user['password1'].encode('utf-8'), bcrypt.gensalt(rounds=4)).decode('utf-8'),
+#     )
+#     session.add(user_to_save)
+#     await session.commit()
+#     return {
+#         'ok': True,
+#         'message': 'Registration success'
+#     }
 
 
 async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: Response):
-    if user_in.number[2:] == '+7':
-        number = user_in.number.replace('+7', '8')
-    else:
-        number = user_in.number
-
-    query = select(Users).where(Users.number == number)
+    query = select(Users).where(Users.username == user_in.username)
     result = await session.execute(query)
     user = result.scalar_one_or_none()
 
@@ -59,8 +53,6 @@ async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: 
     refresh_token = create_refresh_token(user.id)
     response.set_cookie('refresh_token', refresh_token, secure=True, httponly=True, samesite='lax')
     return {'ok': True,
-            'access_token': access_token,
-            'refresh_token': refresh_token,
             'message': 'Login user success'}
 
 

@@ -66,7 +66,6 @@ async def get_random_questions(
         time_expire=7200,
         arg=rndm_questions
     )
-
     return {
         'ok': True,
         'test_was_passed': False,
@@ -217,6 +216,7 @@ async def finish_test(
         raise HTTPException(status_code=400, detail='No questions')
 
     redis_client.setex(redis_results_key, 1200, json.dumps(answer_details))
+
     score = int((correct_count / total_questions) * 100)
 
     new_attempt = UserAttempts(
@@ -252,7 +252,6 @@ async def get_result_test(
         raise HTTPException(status_code=404, detail="Results expired or not found")
 
     answers_data = redis_client.get(redis_key)
-
     if not answers_data:
         raise HTTPException(
             status_code=404,

@@ -6,23 +6,24 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.models.base import Base
 
-
 if TYPE_CHECKING:
     from src.core.models.rewards import UserReward
     from src.core.models.tests import TestsName
+    from src.core.models.cases import Cases
 
 
 class Users(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    number: Mapped[str] = mapped_column(String(12), unique=True, index=True)
+    username: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     password: Mapped[str] = mapped_column(String(255), index=True)
     create_at: Mapped[datetime] = mapped_column(default=func.now())
 
     profile: Mapped['Profiles'] = relationship(back_populates='user', uselist=False)
     user_attempt: Mapped[list['UserAttempts']] = relationship(back_populates='user')
     rewards: Mapped[list['UserReward']] = relationship(back_populates='user')
+    user_attempt_case: Mapped[list['UserAttemptsCase']] = relationship(back_populates='user')
 
 
 class Profiles(Base):
@@ -53,4 +54,13 @@ class UserAttempts(Base):
     test: Mapped['TestsName'] = relationship(back_populates='user_attempt')
 
 
+class UserAttemptsCase(Base):
+    __tablename__ = 'user_attempts_case'
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), index=True)
+    case_id: Mapped[int] = mapped_column(Integer, ForeignKey('cases.id'), index=True)
+    complete_at: Mapped[datetime] = mapped_column(default=func.now(), index=True)
+
+    user: Mapped['Users'] = relationship(back_populates='user_attempt_case')
+    case: Mapped['Cases'] = relationship(back_populates='user_attempts_case')

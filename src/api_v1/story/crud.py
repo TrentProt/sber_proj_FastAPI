@@ -55,15 +55,19 @@ async def get_all_story(session: AsyncSession):
         story_data = {
             'id': story.id,
             'title': story.title,
-            'body': story.body,
+            'body': [story.body],
             'img_url': story.img_url if story.img_url else '',
             'position': {
-                'top': '15%',
-                'left': '10%'
+                'bottom': '15%',
+                'right': '10%'
             },
             'size': {
-                'width': '70%',
-                'height': '60vh'
+                'width': 12,
+                'height': 13
+            },
+            'color': {
+                'top': '#27AE60',
+                'bottom': '#0EB4B0'
             }
         }
         response_data.append(story_data)
