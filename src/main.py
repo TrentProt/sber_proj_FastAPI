@@ -18,6 +18,7 @@ from src.api_v1.topics.views import router as topics_router
 from src.api_v1.story.views import router as story_router
 from src.api_v1.static_test.views import router as static_tests_router
 from src.api_v1.rewards.views import router as rewards_router
+from src.api_v1.cases.views import router as cases_router
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -49,6 +50,7 @@ app.include_router(static_tests_router)
 app.include_router(topics_router)
 app.include_router(story_router)
 app.include_router(rewards_router)
+app.include_router(cases_router)
 
 
 app.add_middleware(

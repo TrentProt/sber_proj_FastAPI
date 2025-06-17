@@ -21,6 +21,7 @@ class Topics(Base):
 
     user_reward: Mapped[list['UserReward']] = relationship(back_populates='topic')
     section_topic: Mapped[list['SectionsTopic']] = relationship(back_populates='topic')
+    cases: Mapped[list['Cases']] = relationship(back_populates='topic')
 
 
 class SectionsTopic(Base):
@@ -31,7 +32,6 @@ class SectionsTopic(Base):
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(String(255))
     img_url: Mapped[str] = mapped_column(String(255), nullable=True)
-    type: Mapped[str] = mapped_column(String(255), nullable=True)
 
     topic: Mapped['Topics'] = relationship(back_populates='section_topic')
     test: Mapped[list['TestsName']] = relationship(back_populates='section_topic')
