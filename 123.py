@@ -1,5 +1,2 @@
-p = []
-if p:
-    print('1')
-else:
-    print(4)
+p = 0
+print(bool(p))

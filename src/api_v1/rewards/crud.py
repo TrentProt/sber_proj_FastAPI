@@ -33,6 +33,7 @@ async def get_all_user_rewards(
             'reward': reward.reward.name,
             'description': reward.reward.description,
             'image_url': reward.reward.image_url,
+            'topic_id': reward.topic_id,
             'topic': topics_map[reward.topic_id]
         }
         for reward in rewards

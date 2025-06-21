@@ -8,12 +8,6 @@ class QAnswers(BaseModel):
     answer_id: Union[int, None] = None
 
 
-class AddUserAttempt(BaseModel):
-    time_execution: int
-    # Секунды
-    qanswers: List[QAnswers]
-
-
 class StartFinishTestSchema(BaseModel):
     ok: bool
     test_was_passed: bool
@@ -27,8 +21,7 @@ class AnswerSchema(BaseModel):
 
 class GetQuestionAndAnswersSchema(BaseModel):
     q_num: int
-    question_id: int
-    question: str
+    question_text: str
     answers: List[AnswerSchema]
     tip: str
 
@@ -58,3 +51,8 @@ class ResultTestSchema(BaseModel):
     score: int
     time_execution: int
     data_answers: List[ResultAnswersUserSchema]
+
+
+class OkStatusSchema(BaseModel):
+    ok: bool
+    message: str
