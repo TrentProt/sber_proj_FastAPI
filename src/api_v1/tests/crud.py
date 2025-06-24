@@ -187,10 +187,6 @@ async def add_answers(
     await redis_client.hset(redis_key_answers, str(q_num), json.dumps(answer_data))
     await redis_client.expire(redis_key, 7200)
 
-    redis_key_answers = f"user:{user_id}:test:{test_id}:answers"
-    all_answers = await redis_client.hgetall(redis_key_answers)
-    print(all_answers)
-
     return {
         'ok': True,
         'message': 'Added answer'
@@ -217,7 +213,6 @@ async def finish_test(
     count_question = (await session.execute(stmt)).scalar()
     redis_key_answers = f"user:{user_id}:test:{test_id}:answers"
     all_answers = await redis_client.hgetall(redis_key_answers)
-    print(all_answers)
 
     if not all_answers:
         raise HTTPException(status_code=400, detail="No answers found")
@@ -262,7 +257,7 @@ async def get_result_test(
     all_answers = await redis_client.hgetall(redis_key_answers)
     await redis_client.delete(redis_key_answers)
     await redis_client.delete(redis_key)
-    print(all_answers)
+
     if not all_answers:
         raise HTTPException(status_code=400, detail="No answers found")
 

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.universal_for_test import crud
@@ -6,6 +7,7 @@ from src.api_v1.universal_for_test.schemas import GetTestSchema
 from src.core.models import db_helper
 
 router = APIRouter(tags=['Random tests', 'Static tests'], prefix='/tests')
+
 
 @router.get('/{test_id}')
 async def get_test(

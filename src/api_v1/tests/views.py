@@ -1,4 +1,7 @@
+import time
+
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.tests import crud
@@ -9,7 +12,6 @@ from src.core.models import db_helper
 
 
 router = APIRouter(tags=['Random tests'], prefix='/tests')
-
 
 @router.get('/{test_id}/start')
 async def generate_questions(
