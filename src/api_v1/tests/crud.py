@@ -33,7 +33,7 @@ async def get_random_questions(
 
     redis_key = f'user:{user_id}:test:{test_id}:questions'
 
-    if redis_client.exists(redis_key):
+    if await redis_client.exists(redis_key):
         return {
             'ok': True,
             'test_was_passed': False,
@@ -60,7 +60,7 @@ async def get_random_questions(
 
     rndm_questions = random.sample(all_question_id, test.count_question)
 
-    redis_helper(
+    await redis_helper(
         redis_key=redis_key,
         time_expire=7200,
         arg=rndm_questions
@@ -102,10 +102,10 @@ async def get_qa_for_test(
 ):
     redis_key = f"user:{user_id}:test:{test_id}:questions"
 
-    if not redis_client.exists(redis_key):
+    if not await redis_client.exists(redis_key):
         raise HTTPException(status_code=400, detail='Not add in redis')
 
-    question_ids = redis_client.lrange(redis_key, 0, -1)
+    question_ids = await redis_client.lrange(redis_key, 0, -1)
 
     if not question_ids or q_num > len(question_ids):
         raise HTTPException(status_code=404, detail="Question not found")
@@ -152,10 +152,11 @@ async def add_answers(
 ):
     redis_key = f"user:{user_id}:test:{test_id}:questions"
 
-    if not redis_client.exists(redis_key):
+    if not await redis_client.exists(redis_key):
         raise HTTPException(status_code=400, detail='Not add in redis')
 
-    question_ids = redis_client.lrange(redis_key, 0, -1)
+    question_ids = await redis_client.lrange(redis_key, 0, -1)
+
     if not question_ids or q_num > len(question_ids):
         raise HTTPException(status_code=404, detail="Question not found")
 
@@ -183,8 +184,13 @@ async def add_answers(
         "is_correct": int(is_correct),
         "correct_answer_id": correct_answer.id if correct_answer else None
     }
-    redis_client.hset(redis_key_answers, str(q_num), json.dumps(answer_data))
-    redis_client.expire(redis_key, 7200)
+    await redis_client.hset(redis_key_answers, str(q_num), json.dumps(answer_data))
+    await redis_client.expire(redis_key, 7200)
+
+    redis_key_answers = f"user:{user_id}:test:{test_id}:answers"
+    all_answers = await redis_client.hgetall(redis_key_answers)
+    print(all_answers)
+
     return {
         'ok': True,
         'message': 'Added answer'
@@ -199,18 +205,19 @@ async def finish_test(
 ):
     redis_key = f"user:{user_id}:test:{test_id}:questions"
 
-    if not redis_client.exists(redis_key):
+    if not await redis_client.exists(redis_key):
         raise HTTPException(status_code=400, detail='Not add in redis')
 
-    question_ids = [int(qid) for qid in redis_client.lrange(redis_key, 0, -1)]
+    question_ids = [int(qid) for qid in await redis_client.lrange(redis_key, 0, -1)]
 
     stmt = select(func.count(Questions.id)).where(
         Questions.test_id == test_id,
         Questions.id.in_(question_ids)
     )
     count_question = (await session.execute(stmt)).scalar()
-    redis_key = f"user:{user_id}:test:{test_id}:answers"
-    all_answers = redis_client.hgetall(redis_key)
+    redis_key_answers = f"user:{user_id}:test:{test_id}:answers"
+    all_answers = await redis_client.hgetall(redis_key_answers)
+    print(all_answers)
 
     if not all_answers:
         raise HTTPException(status_code=400, detail="No answers found")
@@ -246,16 +253,16 @@ async def get_result_test(
 ):
     redis_key = f"user:{user_id}:test:{test_id}:questions"
 
-    if not redis_client.exists(redis_key):
+    if not await redis_client.exists(redis_key):
         raise HTTPException(status_code=400, detail='Not add in redis')
 
-    question_ids = [int(qid) for qid in redis_client.lrange(redis_key, 0, -1)]
+    question_ids = [int(qid) for qid in await redis_client.lrange(redis_key, 0, -1)]
 
     redis_key_answers = f"user:{user_id}:test:{test_id}:answers"
-    all_answers = redis_client.hgetall(redis_key_answers)
-    redis_client.delete(redis_key_answers)
-    redis_client.delete(redis_key)
-
+    all_answers = await redis_client.hgetall(redis_key_answers)
+    await redis_client.delete(redis_key_answers)
+    await redis_client.delete(redis_key)
+    print(all_answers)
     if not all_answers:
         raise HTTPException(status_code=400, detail="No answers found")
 

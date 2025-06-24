@@ -24,8 +24,8 @@ class TestPassed(OkStatus):
 
 
 class UserAnswerSchema(BaseModel):
-    id: int
-    answer_text: str
+    id: Union[int, None]
+    answer_text: Union[str, None]
 
 
 class CorrectAnswerSchema(BaseModel):
