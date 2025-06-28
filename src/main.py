@@ -15,13 +15,15 @@ from fastapi.staticfiles import StaticFiles
 
 from src.api_v1.users.views import router as users_router
 from src.api_v1.auth.views import router as auth_router
-from src.api_v1.universal_for_test.views import router as universal_tests_router
+from src.api_v1.universal_for_test.views import (router
+                                                 as universal_tests_router)
 from src.api_v1.tests.views import router as random_tests_router
 from src.api_v1.topics.views import router as topics_router
 from src.api_v1.story.views import router as story_router
 from src.api_v1.static_test.views import router as static_tests_router
 from src.api_v1.rewards.views import router as rewards_router
 from src.api_v1.cases.views import router as cases_router
+from src.api_v1.leaderboard.views import router as leaderboard_router
 from src.core.redis import redis_client
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -33,11 +35,6 @@ STORY_IMG_DIR = IMAGES_DIR / "story"
 for folder in [TOPICS_IMG_DIR, STORY_IMG_DIR]:
     folder.mkdir(parents=True, exist_ok=True)
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     # async with db_helper.engine.begin() as conn:
-#     #     await conn.run_sync(Base.metadata.create_all)
-#     yield
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -58,6 +55,7 @@ app.include_router(topics_router)
 app.include_router(story_router)
 app.include_router(rewards_router)
 app.include_router(cases_router)
+app.include_router(leaderboard_router)
 
 
 app.add_middleware(

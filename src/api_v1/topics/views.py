@@ -11,11 +11,11 @@ from src.api_v1.topics.schemas import TopicsOut
 from src.core.models import db_helper
 
 
-
 router = APIRouter(tags=['Topics and Sections for main'])
 
+
 @router.get('/topics')
-@cache(expire=)
+@cache(expire=300)
 async def get_topics(
         _: Union[str, None] = Depends(get_id_user_or_none_from_cookie),
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -24,6 +24,7 @@ async def get_topics(
 
 
 @router.get('/sections_topics')
+@cache(expire=300)
 async def get_sections_topics(
         user_id: Union[str, None] = Depends(get_id_user_or_none_from_cookie),
         session: AsyncSession = Depends(db_helper.session_dependency)
