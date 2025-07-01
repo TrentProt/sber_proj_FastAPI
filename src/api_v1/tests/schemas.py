@@ -56,3 +56,7 @@ class ResultTestSchema(BaseModel):
 class OkStatusSchema(BaseModel):
     ok: bool
     message: str
+
+
+class CheckNewRewardSchema(OkStatusSchema):
+    reward_id: Union[int, None]

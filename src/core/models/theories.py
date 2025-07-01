@@ -12,8 +12,8 @@ class TheoriesTable(Base):
     __tablename__ = 'theories'
     __table_args__ = {'extend_existing': True}
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'), index=True)
     book: Mapped[str] = mapped_column(String(255))
     link: Mapped[str] = mapped_column(String(255))
 

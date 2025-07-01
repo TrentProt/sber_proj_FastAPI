@@ -1,4 +1,3 @@
-p = [0]
-b = p
-b.append(1)
-print(p, b)
+if not True:
+    print(1)
+print(2)

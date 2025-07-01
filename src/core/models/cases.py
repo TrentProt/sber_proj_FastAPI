@@ -14,9 +14,13 @@ if TYPE_CHECKING:
 class Cases(Base):
     __tablename__ = 'cases'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'), index=True, nullable=True)
-    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'), index=True, nullable=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    section_topic_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('section_topic.id'), index=True, nullable=True
+    )
+    topic_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey('topics.id'), index=True, nullable=True
+    )
     title: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[str] = mapped_column(String(255))
     icon: Mapped[str] = mapped_column(String(255))

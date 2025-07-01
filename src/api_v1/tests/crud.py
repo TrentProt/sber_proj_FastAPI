@@ -7,8 +7,10 @@ from sqlalchemy import select, and_, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+from src.api_v1.rewards.service import RewardService
 from src.api_v1.tests.service import redis_helper
 from src.core.models import TestsName, Questions, UserAttempts
+from src.core.models.tests import SectionsTopic
 from src.core.redis import redis_client
 
 
@@ -224,9 +226,21 @@ async def finish_test(
             correct_count += 1
 
     score = int((correct_count / count_question) * 100) if correct_count else 0
+
+    stmt_topic = select(
+        SectionsTopic.topic_id
+    ).join(
+        SectionsTopic.test
+    ).where(
+        TestsName.id == test_id
+    )
+
+    topic_id = (await session.execute(stmt_topic)).scalar_one_or_none()
+
     new_attempt = UserAttempts(
         user_id=user_id,
         test_id=test_id,
+        topic_id=topic_id,
         count_correct_answer=correct_count,
         time_execution=time_execution,
         score=score
@@ -234,9 +248,18 @@ async def finish_test(
     session.add(new_attempt)
     await session.commit()
 
+    reward_result = None
+
+    if score >= 75:
+        reward_service = RewardService(session=session, redis_client=redis_client)
+        reward_result = await reward_service.check_and_add_reward(
+            topic_id=topic_id,
+            user_id=user_id
+        )
+
     return {
         'ok': True,
-        'test_was_passed': True,
+        'reward_id': reward_result if reward_result else None,
         'message': 'Test passed'
     }
 

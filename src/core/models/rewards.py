@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class Rewards(Base):
     __tablename__ = 'rewards'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(32), unique=True)
     description: Mapped[str] = mapped_column(String(50))
     image_url: Mapped[str] = mapped_column(String(255))
@@ -25,9 +25,9 @@ class UserReward(Base):
     __tablename__ = 'user_reward'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'))
-    reward_id: Mapped[int] = mapped_column(Integer, ForeignKey('rewards.id'))
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), index=True)
+    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'), index=True)
+    reward_id: Mapped[int] = mapped_column(Integer, ForeignKey('rewards.id'), index=True)
 
     user: Mapped['Users'] = relationship(back_populates='rewards')
     topic: Mapped['Topics'] = relationship(back_populates='user_reward')

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.tests import crud
 from src.api_v1.tests.schemas import GetQuestionAndAnswersSchema, \
-    StartFinishTestSchema, ResultTestSchema, OkStatusSchema
+    StartFinishTestSchema, ResultTestSchema, OkStatusSchema, CheckNewRewardSchema
 from src.core.dependencies import verify_access_token
 from src.core.models import db_helper
 
@@ -66,7 +66,7 @@ async def add_results_test(
         time_execution: int,
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
-) -> OkStatusSchema:
+) -> CheckNewRewardSchema:
     user_id = int(token_payload.get('sub'))
     return await crud.finish_test(
         test_id=test_id,

@@ -1,12 +1,17 @@
+import asyncio
 from typing import List
 
 from fastapi import APIRouter, Depends
+from sqlalchemy import select, and_, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from src.api_v1.rewards import crud
 from src.api_v1.rewards.schemas import GetAllRewards, GetAllUserRewards
 from src.core.dependencies import verify_access_token
-from src.core.models import db_helper
+from src.core.models import db_helper, UserAttempts, Topics, UserReward
+from src.core.models.tests import SectionsTopic, TestsName
+from src.core.redis import redis_client
 
 router = APIRouter(tags=['Rewards'], prefix='/rewards')
 

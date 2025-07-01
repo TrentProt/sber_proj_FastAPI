@@ -15,20 +15,21 @@ if TYPE_CHECKING:
 class Topics(Base):
     __tablename__ = 'topics'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String, unique=True)
     description: Mapped[str] = mapped_column(String(255))
 
     user_reward: Mapped[list['UserReward']] = relationship(back_populates='topic')
     section_topic: Mapped[list['SectionsTopic']] = relationship(back_populates='topic')
     cases: Mapped[list['Cases']] = relationship(back_populates='topic')
+    user_attempts: Mapped[list['UserAttempts']] = relationship(back_populates='topic')
 
 
 class SectionsTopic(Base):
     __tablename__ = 'section_topic'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'))
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('topics.id'), index=True)
     title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(String(255))
     img_url: Mapped[str] = mapped_column(String(255), nullable=True)
@@ -42,10 +43,10 @@ class SectionsTopic(Base):
 class TestsName(Base):
     __tablename__ = 'tests'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     section_topic_id: Mapped[int] = mapped_column(Integer, ForeignKey('section_topic.id'), index=True)
-    type_test: Mapped[str] = mapped_column(String(20), nullable=True)
-    title: Mapped[str] = mapped_column(String(255), index=True)
+    type_test: Mapped[str] = mapped_column(String(20), nullable=True, index=True)
+    title: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(String(255))
     count_question: Mapped[int] = mapped_column(Integer, nullable=True)
     # В секундах
@@ -59,7 +60,7 @@ class TestsName(Base):
 class Questions(Base):
     __tablename__ = 'questions'
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'), index=True)
     question_text: Mapped[str] = mapped_column(String(255), unique=True)
 
