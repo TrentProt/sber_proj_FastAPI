@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.cases import crud
@@ -9,6 +10,7 @@ from src.core.models import db_helper
 router = APIRouter(tags=['Cases'], prefix='/cases')
 
 @router.get('/{case_id}')
+@cache(expire=60*60*4)
 async def get_case(
         case_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency)
@@ -20,6 +22,7 @@ async def get_case(
 
 
 @router.get('/{case_id}/start')
+@cache(expire=60*60*2)
 async def start_case(
         case_id: int,
         _: dict = Depends(verify_access_token),

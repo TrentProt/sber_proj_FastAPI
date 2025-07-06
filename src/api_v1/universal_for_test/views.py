@@ -10,6 +10,7 @@ router = APIRouter(tags=['Random tests', 'Static tests'], prefix='/tests')
 
 
 @router.get('/{test_id}')
+@cache(expire=60*60*8)
 async def get_test(
         test_id: int,
         session: AsyncSession = Depends(db_helper.session_dependency)

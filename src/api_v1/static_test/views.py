@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from fastapi_cache.decorator import cache
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +13,7 @@ router = APIRouter(tags=['Static tests'], prefix='/static_test')
 
 
 @router.get('/{test_id}/start')
+@cache(expire=60*60)
 async def get_questions(
         test_id: int,
         _: dict = Depends(verify_access_token),
@@ -24,6 +26,7 @@ async def get_questions(
 
 
 @router.get('/{test_id}/question/{q_num}')
+@cache(expire=60*60)
 async def get_question_answers(
         test_id: int,
         q_num: int,

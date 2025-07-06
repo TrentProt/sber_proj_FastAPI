@@ -1,1 +1,3 @@
 src/certs/
+.env
+alembic
