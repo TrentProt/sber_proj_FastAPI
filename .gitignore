@@ -1,3 +1,8 @@
 src/certs/
 .env
 alembic
+.venv/
+.idea/
+__pycache__/
+123.py
+1.txt

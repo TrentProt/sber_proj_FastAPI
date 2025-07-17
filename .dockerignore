@@ -1,0 +1,6 @@
+.idea/
+.venv/
+__pycache__/
+.git/
+123.py
+1.txt
