@@ -6,3 +6,4 @@ alembic
 __pycache__/
 123.py
 1.txt
+openapi.json
