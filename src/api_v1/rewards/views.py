@@ -26,7 +26,7 @@ async def get_all(
 async def get_all_user_rewards(
         token_payload: dict = Depends(verify_access_token),
         session: AsyncSession = Depends(db_helper.session_dependency)
-) -> GetAllUserRewards:
+) -> List[GetAllUserRewards]:
     user_id = int(token_payload.get('sub'))
     return await crud.get_all_user_rewards(
         user_id=user_id,

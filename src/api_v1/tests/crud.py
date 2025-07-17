@@ -127,10 +127,7 @@ async def get_qa_for_test(
         raise HTTPException(status_code=404, detail='Page not found')
 
     all_answers = question.answers
-    correct_answer_id = [a for a in all_answers if a.correct]
-    wrong_answer_id = [a for a in all_answers if not a.correct]
-    select_3_wrong_1_correct = random.sample(wrong_answer_id, 3) + correct_answer_id
-    random.shuffle(select_3_wrong_1_correct)
+    random.shuffle(all_answers)
     return {
         'q_num': int(q_num),
         'question_text': question.question_text,
@@ -139,9 +136,9 @@ async def get_qa_for_test(
                 'id': answer.id,
                 'answer_text': answer.answer_text.strip()
             }
-            for answer in select_3_wrong_1_correct
+            for answer in all_answers
         ],
-        'tip': 'Подсказка'
+        'tip': question.hint
     }
 
 
@@ -187,7 +184,7 @@ async def add_answers(
         "correct_answer_id": correct_answer.id if correct_answer else None
     }
     await redis_client.hset(redis_key_answers, str(q_num), json.dumps(answer_data))
-    await redis_client.expire(redis_key, 7200)
+    await redis_client.expire(redis_key_answers, 7200)
 
     return {
         'ok': True,
@@ -287,8 +284,13 @@ async def get_result_test(
     stmt = select(Questions).options(joinedload(Questions.answers)).where(
         Questions.test_id == test_id,
         Questions.id.in_(question_ids)
-    ).order_by(Questions.id)
+    )
     questions = (await session.execute(stmt)).unique().scalars().all()
+
+    question_map = {
+        question.id: question
+        for question in questions
+    }
 
     stmt_attempt = select(
         UserAttempts
@@ -301,11 +303,12 @@ async def get_result_test(
     result_attepmt = (await session.execute(stmt_attempt)).scalar_one_or_none()
 
     if not result_attepmt:
-        raise HTTPException(status_code=404, detail="Test attempt not found")
+        raise HTTPException(status_code=500, detail="Test attempt not found")
 
     data_answers = []
-    for q_num, question in enumerate(questions, start=1):
+    for q_num, question_id in enumerate(question_ids, start=1):
         answer_json = all_answers.get(str(q_num))
+        question = question_map[question_id]
 
         if answer_json:
             user_answer_data = json.loads(answer_json)

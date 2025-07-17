@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      pg:
+        condition: service_healthy
+    environment:
+      - DB_URL=postgresql+asyncpg://test:test@pg:5432/notes
+      - DB_ECHO=True
+
+  pg:
+    image: postgres:15.13
+    environment:
+      POSTGRES_DB: notes
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d notes"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      pg:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - '5050:80'
+volumes:
+  pgdata:

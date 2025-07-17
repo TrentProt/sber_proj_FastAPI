@@ -11,24 +11,24 @@ from src.core.models.users import Users
 
 import bcrypt
 
-# async def create_user(session: AsyncSession, user_in: CreateUserSchema):
-#     user = user_in.model_dump()
-#     if user['password1'] != user['password2']:
-#         raise HTTPException(status_code=401, detail='Пароли не совпадают')
-#     if user["number"][:2] == '+7':
-#         number = user['number'].replace('+7', '8')
-#     else:
-#         number = user['number']
-#     user_to_save = Users(
-#         number=number,
-#         password=bcrypt.hashpw(user['password1'].encode('utf-8'), bcrypt.gensalt(rounds=4)).decode('utf-8'),
-#     )
-#     session.add(user_to_save)
-#     await session.commit()
-#     return {
-#         'ok': True,
-#         'message': 'Registration success'
-#     }
+async def create_user(session: AsyncSession, user_in: CreateUserSchema):
+    user = user_in.model_dump()
+    if user['password1'] != user['password2']:
+        raise HTTPException(status_code=401, detail='Пароли не совпадают')
+    if user["number"][:2] == '+7':
+        number = user['number'].replace('+7', '8')
+    else:
+        number = user['number']
+    user_to_save = Users(
+        number=number,
+        password=bcrypt.hashpw(user['password1'].encode('utf-8'), bcrypt.gensalt(rounds=4)).decode('utf-8'),
+    )
+    session.add(user_to_save)
+    await session.commit()
+    return {
+        'ok': True,
+        'message': 'Registration success'
+    }
 
 
 async def login_user(session: AsyncSession, user_in: LoginUserSchema, response: Response):

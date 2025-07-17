@@ -1,7 +1,5 @@
-import time
-
 from fastapi import APIRouter, Depends
-from fastapi_cache.decorator import cache
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api_v1.tests import crud

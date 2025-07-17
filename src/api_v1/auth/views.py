@@ -13,12 +13,13 @@ from src.api_v1.auth import crud
 
 router = APIRouter(tags=['Auth'], prefix='/auth')
 
-# @router.post('/registration')
-# async def create_user(
-#         user: CreateUserSchema,
-#         session: AsyncSession = Depends(db_helper.session_dependency),
-#     ) -> OkResponse:
-#     return await crud.create_user(session=session, user_in=user)
+
+@router.post('/registration')
+async def create_user(
+        user: CreateUserSchema,
+        session: AsyncSession = Depends(db_helper.session_dependency),
+    ) -> OkResponse:
+    return await crud.create_user(session=session, user_in=user)
 
 
 @router.post('/login')

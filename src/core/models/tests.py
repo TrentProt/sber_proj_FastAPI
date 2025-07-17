@@ -1,3 +1,4 @@
+from enum import unique
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Integer, String, ForeignKey, Boolean
@@ -63,6 +64,7 @@ class Questions(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     test_id: Mapped[int] = mapped_column(Integer, ForeignKey('tests.id'), index=True)
     question_text: Mapped[str] = mapped_column(String(255), unique=True)
+    hint: Mapped[str] = mapped_column(String(255), nullable=True)
 
     test: Mapped['TestsName'] = relationship(back_populates='questions')
     answers: Mapped[list['Answers']] = relationship(back_populates='question')
